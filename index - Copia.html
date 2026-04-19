@@ -10,34 +10,10 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   const SUPABASE_URL = 'https://jahwlmhbjaavdiissyms.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphaHdsbWhiamFhdmRpaXNzeW1zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTIyNDUsImV4cCI6MjA5MjE4ODI0NX0.aXCVwMQFd3y2XhKFI1gvfac32DMK-Yl9AZLGfCxujmI';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphaHdsbWhiamFhdmRpaXNzeW1zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTIyNDUsImV4cCI6MjA5MjE4ODI0NX0.aXCVwMQFd3y2XhKFI1gvfac32DMK-Yl9AZLGfCxujmI  ';
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  console.log('Supabase connected:', !!sb); 
 
-  // ── Conversion helpers: JS object ↔ Supabase row ──────────────
-  function txToRow(t){
-    return{
-      id:t.id,tipo:t.tipo,descricao:t.descricao,valor:t.valor,
-      data:t.data,categoria:t.categoria,obs:t.obs||'',
-      recorrente_id:t.recorrenteId||null,
-      parcela_atual:t.parcela?.atual||null,
-      parcela_total:t.parcela?.total||null,
-      parcela_grupo:t.parcela?.grupo||null
-    };
-  }
-  function rowToTx(r){
-    return{
-      id:r.id,tipo:r.tipo,descricao:r.descricao,valor:parseFloat(r.valor),
-      data:r.data,categoria:r.categoria,obs:r.obs||'',
-      recorrenteId:r.recorrente_id||null,
-      parcela:r.parcela_atual?{atual:r.parcela_atual,total:r.parcela_total,grupo:r.parcela_grupo}:null
-    };
-  }
-  function recToRow(r){
-    return{id:r.id,tipo:r.tipo,nome:r.nome,valor:r.valor,dia:r.dia,categoria:r.categoria,ativo:r.ativo};
-  }
-  function rowToRec(r){
-    return{id:r.id,tipo:r.tipo,nome:r.nome,valor:parseFloat(r.valor),dia:r.dia,categoria:r.categoria,ativo:r.ativo};
-  }
 </script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -559,15 +535,15 @@ main{max-width:1140px;margin:0 auto;padding:2rem 1.5rem}
 <script>
 const DEFAULT_CATS_DESPESA=['Moradia','Alimentação','Transporte','Saúde','Lazer','Utilidades','Poupança','Outros'];
 const DEFAULT_CATS_RECEITA=['Salário','Freelance','Investimento','Outros'];
-let catsDespesa=[...DEFAULT_CATS_DESPESA];
-let catsReceita=[...DEFAULT_CATS_RECEITA];
+let catsDespesa=JSON.parse(localStorage.getItem('fn_cats_desp')||'null')||[...DEFAULT_CATS_DESPESA];
+let catsReceita=JSON.parse(localStorage.getItem('fn_cats_rec')||'null')||[...DEFAULT_CATS_RECEITA];
 const CAT_SLUG = c => c.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 const CHART_COLORS = ['#5B6CF9','#F5A623','#FF4F72','#12CFA0','#A78BFA','#22D3EE','#F472B6','#6B7280'];
 const MESES_PT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 
-let transacoes = [];
-let recorrentes = [];
-let orcamentos = {};
+let transacoes = JSON.parse(localStorage.getItem('fn_tx') || '[]');
+let recorrentes = JSON.parse(localStorage.getItem('fn_rec') || '[]');
+let orcamentos = JSON.parse(localStorage.getItem('fn_orc') || '{}');
 let tipoAtual = 'despesa';
 let tipoRecAtual = 'despesa';
 let parcelado = false;
@@ -575,50 +551,12 @@ let editandoId = null;
 let editandoGrupo = false;
 let graficosCat = null, graficosFluxo = null;
 
-async function salvar(){
-  // Always backup to localStorage first (works offline)
+function salvar(){
   localStorage.setItem('fn_tx', JSON.stringify(transacoes));
   localStorage.setItem('fn_rec', JSON.stringify(recorrentes));
   localStorage.setItem('fn_orc', JSON.stringify(orcamentos));
   localStorage.setItem('fn_cats_desp', JSON.stringify(catsDespesa));
   localStorage.setItem('fn_cats_rec', JSON.stringify(catsReceita));
-  // Sync to Supabase in the background
-  try{
-    if(transacoes.length){
-      const{error:e1}=await sb.from('transacoes').upsert(transacoes.map(txToRow),{onConflict:'id'});
-      if(e1)throw e1;
-    }
-    if(recorrentes.length){
-      const{error:e2}=await sb.from('recorrentes').upsert(recorrentes.map(recToRow),{onConflict:'id'});
-      if(e2)throw e2;
-    }
-    const orcRows=Object.entries(orcamentos).map(([categoria,limite])=>({categoria,limite}));
-    if(orcRows.length){
-      const{error:e3}=await sb.from('orcamentos').upsert(orcRows,{onConflict:'categoria'});
-      if(e3)throw e3;
-    }
-    const{error:e4}=await sb.from('categorias').upsert([
-      {tipo:'despesa',lista:catsDespesa},
-      {tipo:'receita',lista:catsReceita}
-    ],{onConflict:'tipo'});
-    if(e4)throw e4;
-  }catch(e){
-    console.error('Supabase sync error:',e);
-    toast('Erro ao sincronizar com a nuvem.','err');
-  }
-}
-
-// Delete transactions from Supabase by ID (one or many)
-async function sbDeleteTx(ids){
-  const arr=Array.isArray(ids)?ids:[ids];
-  const{error}=await sb.from('transacoes').delete().in('id',arr);
-  if(error)console.error('sbDeleteTx error:',error);
-}
-
-// Delete a recurring item from Supabase by ID
-async function sbDeleteRec(id){
-  const{error}=await sb.from('recorrentes').delete().eq('id',id);
-  if(error)console.error('sbDeleteRec error:',error);
 }
 
 function fmt(n){return 'R$\u00a0' + Math.abs(n).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}
@@ -829,7 +767,7 @@ function excluirRec(id){
     `<div class="conf-info"><strong>${esc(r.nome)}</strong> — ${fmt(r.valor)}/mês<br>Esta recorrente não gerará mais lançamentos automáticos.</div>Deseja continuar?`,
     [
       {label:'Cancelar',cls:'btn-ghost'},
-      {label:'Excluir',cls:'conf-btn-danger',fn:()=>{recorrentes=recorrentes.filter(x=>x.id!==id);sbDeleteRec(id);salvar();renderRecorrentes();toast('Recorrente excluída.','ok');}},
+      {label:'Excluir',cls:'conf-btn-danger',fn:()=>{recorrentes=recorrentes.filter(x=>x.id!==id);salvar();renderRecorrentes();toast('Recorrente excluída.','ok');}},
     ]
   );
 }
@@ -1096,9 +1034,9 @@ function excluirTx(id){
       `<div class="conf-info"><strong>${esc(tx.descricao)}</strong> — parcela <strong>${tx.parcela.atual} de ${tx.parcela.total}</strong><br>Valor total do grupo: ${totalGrupo}</div>O que você deseja excluir?`,
       [
         {label:'Cancelar',cls:'btn-ghost'},
-        {label:`Só esta parcela`,cls:'btn-ghost',fn:()=>{transacoes=transacoes.filter(t=>t.id!==id);sbDeleteTx([id]);salvar();renderAll();toast('Parcela excluída.','ok');}},
-        {label:`Esta e as seguintes (${restantes.length})`,cls:'btn-ghost',fn:()=>{const ids=new Set(restantes.map(t=>t.id));transacoes=transacoes.filter(t=>!ids.has(t.id));sbDeleteTx([...ids]);salvar();renderAll();toast(`${restantes.length} parcelas excluídas.`,'ok');}},
-        {label:`Todas as ${todas.length} parcelas`,cls:'conf-btn-danger',fn:()=>{const ids=new Set(todas.map(t=>t.id));transacoes=transacoes.filter(t=>!ids.has(t.id));sbDeleteTx([...ids]);salvar();renderAll();toast('Parcelamento excluído.','ok');}},
+        {label:`Só esta parcela`,cls:'btn-ghost',fn:()=>{transacoes=transacoes.filter(t=>t.id!==id);salvar();renderAll();toast('Parcela excluída.','ok');}},
+        {label:`Esta e as seguintes (${restantes.length})`,cls:'btn-ghost',fn:()=>{const ids=new Set(restantes.map(t=>t.id));transacoes=transacoes.filter(t=>!ids.has(t.id));salvar();renderAll();toast(`${restantes.length} parcelas excluídas.`,'ok');}},
+        {label:`Todas as ${todas.length} parcelas`,cls:'conf-btn-danger',fn:()=>{const ids=new Set(todas.map(t=>t.id));transacoes=transacoes.filter(t=>!ids.has(t.id));salvar();renderAll();toast('Parcelamento excluído.','ok');}},
       ]
     );
   } else {
@@ -1107,7 +1045,7 @@ function excluirTx(id){
       `<div class="conf-info"><strong>${esc(tx.descricao)}</strong><br><span style="color:${tx.tipo==='receita'?'var(--green)':'var(--red)'}">${tx.tipo==='receita'?'+':'−'} ${fmt(tx.valor)}</span> · ${fmtData(tx.data)}</div>Esta ação não pode ser desfeita.`,
       [
         {label:'Cancelar',cls:'btn-ghost'},
-        {label:'Excluir',cls:'conf-btn-danger',fn:()=>{transacoes=transacoes.filter(t=>t.id!==id);sbDeleteTx([id]);salvar();renderAll();toast('Transação excluída.','ok');}},
+        {label:'Excluir',cls:'conf-btn-danger',fn:()=>{transacoes=transacoes.filter(t=>t.id!==id);salvar();renderAll();toast('Transação excluída.','ok');}},
       ]
     );
   }
@@ -1291,89 +1229,41 @@ document.addEventListener('keydown',e=>{
   }
 });
 
-// STARTUP — load from Supabase, fallback to localStorage
-async function inicializar(){
-  // Show a subtle loading state
-  document.body.style.opacity='0.5';
-  document.body.style.pointerEvents='none';
-
-  try{
-    // Load transacoes
-    const{data:txRows,error:e1}=await sb.from('transacoes').select('*').order('data',{ascending:false});
-    if(e1)throw e1;
-    transacoes=(txRows||[]).map(rowToTx);
-
-    // Load recorrentes
-    const{data:recRows,error:e2}=await sb.from('recorrentes').select('*');
-    if(e2)throw e2;
-    recorrentes=(recRows||[]).map(rowToRec);
-
-    // Load orcamentos
-    const{data:orcRows,error:e3}=await sb.from('orcamentos').select('*');
-    if(e3)throw e3;
-    orcamentos={};
-    (orcRows||[]).forEach(r=>{orcamentos[r.categoria]=parseFloat(r.limite);});
-
-    // Load categorias
-    const{data:catRows,error:e4}=await sb.from('categorias').select('*');
-    if(e4)throw e4;
-    const catDesp=catRows?.find(r=>r.tipo==='despesa');
-    const catRec=catRows?.find(r=>r.tipo==='receita');
-    catsDespesa=catDesp?.lista||[...DEFAULT_CATS_DESPESA];
-    catsReceita=catRec?.lista||[...DEFAULT_CATS_RECEITA];
-
-  }catch(e){
-    console.error('Erro ao carregar do Supabase, usando localStorage:',e);
-    // Fallback to localStorage if Supabase fails
-    transacoes=JSON.parse(localStorage.getItem('fn_tx')||'[]');
-    recorrentes=JSON.parse(localStorage.getItem('fn_rec')||'[]');
-    orcamentos=JSON.parse(localStorage.getItem('fn_orc')||'{}');
-    catsDespesa=JSON.parse(localStorage.getItem('fn_cats_desp')||'null')||[...DEFAULT_CATS_DESPESA];
-    catsReceita=JSON.parse(localStorage.getItem('fn_cats_rec')||'null')||[...DEFAULT_CATS_RECEITA];
-    toast('Usando dados locais — verifique sua conexão.','err');
-  }
-
-  document.body.style.opacity='1';
-  document.body.style.pointerEvents='';
-
-  // If no data at all, insert sample data
-  if(!transacoes.length){
-    const now=new Date();
-    const m=now.toISOString().slice(0,7);
-    const pm=new Date(now.getFullYear(),now.getMonth()-1).toISOString().slice(0,7);
-    const pm2=new Date(now.getFullYear(),now.getMonth()-2).toISOString().slice(0,7);
-    const gId=uid();
-    transacoes=[
-      {id:uid(),tipo:'receita',descricao:'Salário',valor:9500,data:`${m}-05`,categoria:'Salário',obs:'',recorrenteId:null,parcela:null},
-      {id:uid(),tipo:'despesa',descricao:'Aluguel',valor:2400,data:`${m}-05`,categoria:'Moradia',obs:'',recorrenteId:null,parcela:null},
-      {id:uid(),tipo:'despesa',descricao:'Supermercado',valor:520,data:`${m}-08`,categoria:'Alimentação',obs:'',recorrenteId:null,parcela:null},
-      {id:uid(),tipo:'despesa',descricao:'Gasolina',valor:250,data:`${m}-10`,categoria:'Transporte',obs:'',recorrenteId:null,parcela:null},
-      {id:uid(),tipo:'despesa',descricao:'Notebook Dell',valor:458.33,data:`${m}-12`,categoria:'Outros',obs:'Parcela 3/6',recorrenteId:null,parcela:{atual:3,total:6,grupo:gId}},
-      {id:uid(),tipo:'despesa',descricao:'Plano de saúde',valor:380,data:`${m}-15`,categoria:'Saúde',obs:'',recorrenteId:null,parcela:null},
-      {id:uid(),tipo:'despesa',descricao:'Netflix + Spotify',valor:89,data:`${m}-15`,categoria:'Lazer',obs:'',recorrenteId:null,parcela:null},
-      {id:uid(),tipo:'receita',descricao:'Freela — site',valor:1800,data:`${m}-18`,categoria:'Freelance',obs:'',recorrenteId:null,parcela:null},
-      {id:uid(),tipo:'despesa',descricao:'Restaurante',valor:185,data:`${m}-20`,categoria:'Alimentação',obs:'',recorrenteId:null,parcela:null},
-      {id:uid(),tipo:'receita',descricao:'Salário',valor:9500,data:`${pm}-05`,categoria:'Salário',obs:'',recorrenteId:null,parcela:null},
-      {id:uid(),tipo:'despesa',descricao:'Aluguel',valor:2400,data:`${pm}-05`,categoria:'Moradia',obs:'',recorrenteId:null,parcela:null},
-      {id:uid(),tipo:'despesa',descricao:'Supermercado',valor:490,data:`${pm}-09`,categoria:'Alimentação',obs:'',recorrenteId:null,parcela:null},
-      {id:uid(),tipo:'despesa',descricao:'Notebook Dell',valor:458.33,data:`${pm}-12`,categoria:'Outros',obs:'Parcela 2/6',recorrenteId:null,parcela:{atual:2,total:6,grupo:gId}},
-      {id:uid(),tipo:'receita',descricao:'Salário',valor:9500,data:`${pm2}-05`,categoria:'Salário',obs:'',recorrenteId:null,parcela:null},
-      {id:uid(),tipo:'despesa',descricao:'Aluguel',valor:2400,data:`${pm2}-05`,categoria:'Moradia',obs:'',recorrenteId:null,parcela:null},
-      {id:uid(),tipo:'despesa',descricao:'Notebook Dell',valor:458.33,data:`${pm2}-12`,categoria:'Outros',obs:'Parcela 1/6',recorrenteId:null,parcela:{atual:1,total:6,grupo:gId}},
-    ];
-    recorrentes=[
-      {id:uid(),tipo:'despesa',nome:'Aluguel',valor:2400,dia:5,categoria:'Moradia',ativo:true},
-      {id:uid(),tipo:'receita',nome:'Salário',valor:9500,dia:5,categoria:'Salário',ativo:true},
-      {id:uid(),tipo:'despesa',nome:'Netflix',valor:55.90,dia:15,categoria:'Lazer',ativo:true},
-      {id:uid(),tipo:'despesa',nome:'Academia',valor:120,dia:10,categoria:'Saúde',ativo:false},
-    ];
-    salvar();
-  }
-
-  renderAll();
+// SAMPLE DATA
+if(!transacoes.length){
+  const now=new Date();
+  const m=now.toISOString().slice(0,7);
+  const pm=new Date(now.getFullYear(),now.getMonth()-1).toISOString().slice(0,7);
+  const pm2=new Date(now.getFullYear(),now.getMonth()-2).toISOString().slice(0,7);
+  const gId=uid();
+  transacoes=[
+    {id:uid(),tipo:'receita',descricao:'Salário',valor:9500,data:`${m}-05`,categoria:'Salário',obs:'',recorrenteId:null,parcela:null},
+    {id:uid(),tipo:'despesa',descricao:'Aluguel',valor:2400,data:`${m}-05`,categoria:'Moradia',obs:'',recorrenteId:null,parcela:null},
+    {id:uid(),tipo:'despesa',descricao:'Supermercado',valor:520,data:`${m}-08`,categoria:'Alimentação',obs:'',recorrenteId:null,parcela:null},
+    {id:uid(),tipo:'despesa',descricao:'Gasolina',valor:250,data:`${m}-10`,categoria:'Transporte',obs:'',recorrenteId:null,parcela:null},
+    {id:uid(),tipo:'despesa',descricao:'Notebook Dell',valor:458.33,data:`${m}-12`,categoria:'Outros',obs:'Parcela 3/6',recorrenteId:null,parcela:{atual:3,total:6,grupo:gId}},
+    {id:uid(),tipo:'despesa',descricao:'Plano de saúde',valor:380,data:`${m}-15`,categoria:'Saúde',obs:'',recorrenteId:null,parcela:null},
+    {id:uid(),tipo:'despesa',descricao:'Netflix + Spotify',valor:89,data:`${m}-15`,categoria:'Lazer',obs:'',recorrenteId:null,parcela:null},
+    {id:uid(),tipo:'receita',descricao:'Freela — site',valor:1800,data:`${m}-18`,categoria:'Freelance',obs:'',recorrenteId:null,parcela:null},
+    {id:uid(),tipo:'despesa',descricao:'Restaurante',valor:185,data:`${m}-20`,categoria:'Alimentação',obs:'',recorrenteId:null,parcela:null},
+    {id:uid(),tipo:'receita',descricao:'Salário',valor:9500,data:`${pm}-05`,categoria:'Salário',obs:'',recorrenteId:null,parcela:null},
+    {id:uid(),tipo:'despesa',descricao:'Aluguel',valor:2400,data:`${pm}-05`,categoria:'Moradia',obs:'',recorrenteId:null,parcela:null},
+    {id:uid(),tipo:'despesa',descricao:'Supermercado',valor:490,data:`${pm}-09`,categoria:'Alimentação',obs:'',recorrenteId:null,parcela:null},
+    {id:uid(),tipo:'despesa',descricao:'Notebook Dell',valor:458.33,data:`${pm}-12`,categoria:'Outros',obs:'Parcela 2/6',recorrenteId:null,parcela:{atual:2,total:6,grupo:gId}},
+    {id:uid(),tipo:'receita',descricao:'Salário',valor:9500,data:`${pm2}-05`,categoria:'Salário',obs:'',recorrenteId:null,parcela:null},
+    {id:uid(),tipo:'despesa',descricao:'Aluguel',valor:2400,data:`${pm2}-05`,categoria:'Moradia',obs:'',recorrenteId:null,parcela:null},
+    {id:uid(),tipo:'despesa',descricao:'Notebook Dell',valor:458.33,data:`${pm2}-12`,categoria:'Outros',obs:'Parcela 1/6',recorrenteId:null,parcela:{atual:1,total:6,grupo:gId}},
+  ];
+  recorrentes=[
+    {id:uid(),tipo:'despesa',nome:'Aluguel',valor:2400,dia:5,categoria:'Moradia',ativo:true},
+    {id:uid(),tipo:'receita',nome:'Salário',valor:9500,dia:5,categoria:'Salário',ativo:true},
+    {id:uid(),tipo:'despesa',nome:'Netflix',valor:55.90,dia:15,categoria:'Lazer',ativo:true},
+    {id:uid(),tipo:'despesa',nome:'Academia',valor:120,dia:10,categoria:'Saúde',ativo:false},
+  ];
+  salvar();
 }
 
-inicializar();
+renderAll();
 </script>
 </body>
 </html>
