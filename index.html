@@ -10,7 +10,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   const SUPABASE_URL = 'https://jahwlmhbjaavdiissyms.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphaHdsbWhiamFhdmRpaXNzeW1zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTIyNDUsImV4cCI6MjA5MjE4ODI0NX0.aXCVwMQFd3y2XhKFI1gvfac32DMK-Yl9AZLGfCxujmI';
+  const SUPABASE_KEY = 'COLE_SUA_ANON_KEY_AQUI';
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   // ── Conversion helpers: JS object ↔ Supabase row ──────────────
@@ -21,7 +21,8 @@
       recorrente_id:t.recorrenteId||null,
       parcela_atual:t.parcela?.atual||null,
       parcela_total:t.parcela?.total||null,
-      parcela_grupo:t.parcela?.grupo||null
+      parcela_grupo:t.parcela?.grupo||null,
+      user_id:currentUser?.id
     };
   }
   function rowToTx(r){
@@ -33,7 +34,7 @@
     };
   }
   function recToRow(r){
-    return{id:r.id,tipo:r.tipo,nome:r.nome,valor:r.valor,dia:r.dia,categoria:r.categoria,ativo:r.ativo};
+    return{id:r.id,tipo:r.tipo,nome:r.nome,valor:r.valor,dia:r.dia,categoria:r.categoria,ativo:r.ativo,user_id:currentUser?.id};
   }
   function rowToRec(r){
     return{id:r.id,tipo:r.tipo,nome:r.nome,valor:parseFloat(r.valor),dia:r.dia,categoria:r.categoria,ativo:r.ativo};
@@ -269,6 +270,15 @@ main{max-width:1140px;margin:0 auto;padding:2rem 1.5rem}
 .btn-apply{background:rgba(245,166,35,.15);color:var(--amber);border:1px solid rgba(245,166,35,.25);padding:8px 16px;border-radius:8px;cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;transition:all .15s;display:flex;align-items:center;gap:6px}
 .btn-apply:hover{background:rgba(245,166,35,.25)}
 
+/* LOGIN SCREEN */
+.login-screen{position:fixed;inset:0;background:var(--bg);z-index:1000;display:flex;align-items:center;justify-content:center}
+.login-box{background:var(--surface);border:1px solid var(--border-2);border-radius:20px;padding:2.5rem;width:380px;max-width:90vw}
+.login-logo{text-align:center;margin-bottom:2rem}
+.login-logo-text{font-size:26px;font-weight:700;letter-spacing:-0.5px}
+.login-logo-sub{font-size:14px;color:var(--text-2);margin-top:4px}
+.login-erro{background:var(--red-bg);color:var(--red);padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:1rem;display:none}
+.login-btn{width:100%;justify-content:center;display:flex;padding:11px}
+
 /* PLANEJAMENTO */
 .plan-hero{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem}
 .mes-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:.75rem;margin-bottom:1.5rem}
@@ -323,6 +333,9 @@ main{max-width:1140px;margin:0 auto;padding:2rem 1.5rem}
   <div style="display:flex;align-items:center;gap:8px">
     <button class="btn-icon" onclick="abrirSettings()" title="Configurações">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 10a2 2 0 100-4 2 2 0 000 4z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M13.3 9.6a1 1 0 00.2 1.1l.04.04a1.2 1.2 0 01-1.7 1.7l-.04-.04a1 1 0 00-1.1-.2 1 1 0 00-.6.92v.12a1.2 1.2 0 01-2.4 0v-.06a1 1 0 00-.65-.92 1 1 0 00-1.1.2l-.04.04a1.2 1.2 0 01-1.7-1.7l.04-.04a1 1 0 00.2-1.1 1 1 0 00-.92-.6H3.4a1.2 1.2 0 010-2.4h.06a1 1 0 00.92-.65 1 1 0 00-.2-1.1l-.04-.04a1.2 1.2 0 011.7-1.7l.04.04a1 1 0 001.1.2h.05a1 1 0 00.6-.92V3.4a1.2 1.2 0 012.4 0v.06a1 1 0 00.6.92 1 1 0 001.1-.2l.04-.04a1.2 1.2 0 011.7 1.7l-.04.04a1 1 0 00-.2 1.1v.05a1 1 0 00.92.6h.12a1.2 1.2 0 010 2.4h-.06a1 1 0 00-.92.6z" stroke="currentColor" stroke-width="1.3"/></svg>
+    </button>
+    <button class="btn-icon" onclick="logout()" title="Sair" style="color:var(--text-3)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
     <button class="btn-primary" onclick="abrirModalTx()">
       <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v11M1 6.5h11" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
@@ -568,6 +581,7 @@ const MESES_PT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho',
 let transacoes = [];
 let recorrentes = [];
 let orcamentos = {};
+let currentUser = null;
 let tipoAtual = 'despesa';
 let tipoRecAtual = 'despesa';
 let parcelado = false;
@@ -592,14 +606,14 @@ async function salvar(){
       const{error:e2}=await sb.from('recorrentes').upsert(recorrentes.map(recToRow),{onConflict:'id'});
       if(e2)throw e2;
     }
-    const orcRows=Object.entries(orcamentos).map(([categoria,limite])=>({categoria,limite}));
+    const orcRows=Object.entries(orcamentos).map(([categoria,limite])=>({categoria,limite,user_id:currentUser?.id}));
     if(orcRows.length){
       const{error:e3}=await sb.from('orcamentos').upsert(orcRows,{onConflict:'categoria'});
       if(e3)throw e3;
     }
     const{error:e4}=await sb.from('categorias').upsert([
-      {tipo:'despesa',lista:catsDespesa},
-      {tipo:'receita',lista:catsReceita}
+      {tipo:'despesa',lista:catsDespesa,user_id:currentUser?.id},
+      {tipo:'receita',lista:catsReceita,user_id:currentUser?.id}
     ],{onConflict:'tipo'});
     if(e4)throw e4;
   }catch(e){
@@ -1291,52 +1305,68 @@ document.addEventListener('keydown',e=>{
   }
 });
 
-// STARTUP — load from Supabase, fallback to localStorage
-async function inicializar(){
-  // Show a subtle loading state
+// AUTH ─────────────────────────────────────────────────────────
+async function login(){
+  const email=document.getElementById('login-email').value.trim();
+  const senha=document.getElementById('login-senha').value;
+  const erroEl=document.getElementById('login-erro');
+  const btn=document.getElementById('login-btn');
+  erroEl.style.display='none';
+  btn.textContent='Entrando...';btn.disabled=true;
+  const{data,error}=await sb.auth.signInWithPassword({email,password:senha});
+  btn.textContent='Entrar';btn.disabled=false;
+  if(error){
+    erroEl.textContent='Email ou senha incorretos.';
+    erroEl.style.display='block';
+    return;
+  }
+  currentUser=data.user;
+  document.getElementById('login-screen').style.display='none';
+  await carregarDados();
+}
+
+async function logout(){
+  await sb.auth.signOut();
+  currentUser=null;
+  transacoes=[];recorrentes=[];orcamentos={};
+  catsDespesa=[...DEFAULT_CATS_DESPESA];
+  catsReceita=[...DEFAULT_CATS_RECEITA];
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('login-email').value='';
+  document.getElementById('login-senha').value='';
+}
+
+// LOAD DATA ────────────────────────────────────────────────────
+async function carregarDados(){
   document.body.style.opacity='0.5';
   document.body.style.pointerEvents='none';
-
   try{
-    // Load transacoes
     const{data:txRows,error:e1}=await sb.from('transacoes').select('*').order('data',{ascending:false});
     if(e1)throw e1;
     transacoes=(txRows||[]).map(rowToTx);
 
-    // Load recorrentes
     const{data:recRows,error:e2}=await sb.from('recorrentes').select('*');
     if(e2)throw e2;
     recorrentes=(recRows||[]).map(rowToRec);
 
-    // Load orcamentos
     const{data:orcRows,error:e3}=await sb.from('orcamentos').select('*');
     if(e3)throw e3;
     orcamentos={};
     (orcRows||[]).forEach(r=>{orcamentos[r.categoria]=parseFloat(r.limite);});
 
-    // Load categorias
     const{data:catRows,error:e4}=await sb.from('categorias').select('*');
     if(e4)throw e4;
     const catDesp=catRows?.find(r=>r.tipo==='despesa');
     const catRec=catRows?.find(r=>r.tipo==='receita');
     catsDespesa=catDesp?.lista||[...DEFAULT_CATS_DESPESA];
     catsReceita=catRec?.lista||[...DEFAULT_CATS_RECEITA];
-
   }catch(e){
-    console.error('Erro ao carregar do Supabase, usando localStorage:',e);
-    // Fallback to localStorage if Supabase fails
-    transacoes=JSON.parse(localStorage.getItem('fn_tx')||'[]');
-    recorrentes=JSON.parse(localStorage.getItem('fn_rec')||'[]');
-    orcamentos=JSON.parse(localStorage.getItem('fn_orc')||'{}');
-    catsDespesa=JSON.parse(localStorage.getItem('fn_cats_desp')||'null')||[...DEFAULT_CATS_DESPESA];
-    catsReceita=JSON.parse(localStorage.getItem('fn_cats_rec')||'null')||[...DEFAULT_CATS_RECEITA];
-    toast('Usando dados locais — verifique sua conexão.','err');
+    console.error('Erro ao carregar dados:',e);
+    toast('Erro ao carregar dados da nuvem.','err');
   }
-
   document.body.style.opacity='1';
   document.body.style.pointerEvents='';
 
-  // If no data at all, insert sample data
   if(!transacoes.length){
     const now=new Date();
     const m=now.toISOString().slice(0,7);
@@ -1369,11 +1399,44 @@ async function inicializar(){
     ];
     salvar();
   }
-
   renderAll();
+}
+
+// STARTUP ──────────────────────────────────────────────────────
+async function inicializar(){
+  // Check if user is already logged in (session persists automatically)
+  const{data:{session}}=await sb.auth.getSession();
+  if(session){
+    currentUser=session.user;
+    await carregarDados();
+  } else {
+    // No session — show login screen
+    document.getElementById('login-screen').style.display='flex';
+    setTimeout(()=>document.getElementById('login-email').focus(),100);
+  }
 }
 
 inicializar();
 </script>
+<!-- LOGIN SCREEN -->
+<div id="login-screen" class="login-screen" style="display:none">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-logo-text">Finança<span style="color:var(--accent)">.</span></div>
+      <div class="login-logo-sub">Faça login para continuar</div>
+    </div>
+    <div style="margin-bottom:1rem">
+      <label class="lbl">Email</label>
+      <input class="inp" id="login-email" type="email" placeholder="seu@email.com" onkeydown="if(event.key==='Enter')login()">
+    </div>
+    <div style="margin-bottom:1.5rem">
+      <label class="lbl">Senha</label>
+      <input class="inp" id="login-senha" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()">
+    </div>
+    <div class="login-erro" id="login-erro"></div>
+    <button class="btn-save login-btn" id="login-btn" onclick="login()">Entrar</button>
+  </div>
+</div>
+
 </body>
 </html>
