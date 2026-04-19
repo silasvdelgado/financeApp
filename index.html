@@ -10,7 +10,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   const SUPABASE_URL = 'https://jahwlmhbjaavdiissyms.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphaHdsbWhiamFhdmRpaXNzeW1zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTIyNDUsImV4cCI6MjA5MjE4ODI0NX0.aXCVwMQFd3y2XhKFI1gvfac32DMK-Yl9AZLGfCxujmI';
+  const SUPABASE_KEY = 'COLE_SUA_ANON_KEY_AQUI';
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   // ── Conversion helpers: JS object ↔ Supabase row ──────────────
@@ -67,7 +67,7 @@ html{scrollbar-gutter:stable}
 body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-height:100vh}
 
 /* HEADER */
-header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 2rem;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 2rem;height:60px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:1rem;position:sticky;top:0;z-index:200}
 .logo{font-size:19px;font-weight:700;letter-spacing:-0.5px;color:var(--text)}
 .logo span{color:var(--accent)}
 .nav{display:flex;gap:2px;background:var(--surface-2);padding:4px;border-radius:10px}
@@ -76,6 +76,7 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
 .nav-btn.active{background:var(--surface-3);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.3)}
 .btn-primary{background:var(--accent);color:#fff;border:none;padding:9px 18px;border-radius:8px;cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;transition:background .15s}
 .btn-primary:hover{background:var(--accent-h)}
+.header-right{display:flex;align-items:center;gap:8px;justify-content:flex-end}
 
 /* LAYOUT */
 main{max-width:1140px;margin:0 auto;padding:2rem 1.5rem}
@@ -317,12 +318,92 @@ main{max-width:1140px;margin:0 auto;padding:2rem 1.5rem}
 
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 .page.active{animation:fadeIn .18s ease}
+
+/* ── RESPONSIVE ─────────────────────────────────────────────── */
+@media(max-width:768px){
+  /* HEADER */
+  header{grid-template-columns:1fr auto;height:auto;padding:.75rem 1rem;flex-wrap:wrap;row-gap:.5rem}
+  .nav{grid-column:1/-1;order:3;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .nav::-webkit-scrollbar{display:none}
+  .nav-btn{padding:6px 13px;font-size:12px;flex-shrink:0}
+
+  /* LAYOUT */
+  main{padding:1rem}
+
+  /* PAGE HEAD */
+  .page-head{flex-wrap:wrap;gap:.75rem}
+  .filters{flex-direction:column;align-items:stretch}
+  .filter-select,.filter-input{width:100%}
+
+  /* CARDS */
+  .cards-grid{grid-template-columns:1fr 1fr}
+  .card-value{font-size:19px}
+  .card{padding:1rem 1.25rem}
+
+  /* CHARTS */
+  .charts-row{grid-template-columns:1fr}
+  .chart-wrap{height:190px}
+
+  /* TX TABLE — card style on mobile */
+  .tx-head{display:none}
+  .tx-row{
+    display:flex;flex-direction:column;
+    padding:.875rem 1rem;gap:6px;
+    align-items:stretch
+  }
+  .tx-row-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+  .tx-row-bot{display:flex;justify-content:space-between;align-items:center}
+  .tx-amount{text-align:left}
+  .tx-date{font-size:12px}
+
+  /* REC TABLE — card style on mobile */
+  .rec-head{display:none}
+  .rec-row{
+    display:flex;flex-direction:column;
+    padding:.875rem 1rem;gap:8px
+  }
+  .rec-row-top{display:flex;justify-content:space-between;align-items:center}
+  .rec-row-bot{display:flex;justify-content:space-between;align-items:center}
+
+  /* STATS */
+  .stats-row{grid-template-columns:1fr}
+
+  /* BUDGET */
+  .budget-grid{grid-template-columns:1fr}
+
+  /* PLANNING */
+  .plan-hero{grid-template-columns:1fr 1fr}
+  .mes-grid{grid-template-columns:repeat(3,1fr)}
+  .plan-footer{grid-template-columns:1fr 1fr}
+  .plan-det-head{flex-direction:column;align-items:flex-start}
+
+  /* MODALS */
+  .modal{padding:1.5rem;border-radius:16px;max-height:95vh}
+  .form-row.cols-2{grid-template-columns:1fr}
+  .modal-footer{flex-wrap:wrap}
+  .modal-footer .btn-ghost,.modal-footer .btn-save{flex:1;text-align:center;justify-content:center}
+
+  /* SETTINGS */
+  .settings-panel{width:100%}
+
+  /* TOAST */
+  .toast{left:1rem;right:1rem;bottom:1rem;text-align:center}
+}
+
+@media(max-width:480px){
+  .cards-grid{grid-template-columns:1fr}
+  .plan-hero{grid-template-columns:1fr}
+  .mes-grid{grid-template-columns:repeat(2,1fr)}
+  .plan-footer{grid-template-columns:1fr}
+  .btn-primary .btn-label{display:none}
+  header{padding:.625rem .875rem}
+}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">fin<span>ança</span></div>
+  <div class="logo">silas<span>finanças</span></div>
   <nav class="nav">
     <button class="nav-btn active" onclick="showPage('visao-geral')">Visão Geral</button>
     <button class="nav-btn" onclick="showPage('transacoes')">Transações</button>
@@ -330,7 +411,7 @@ main{max-width:1140px;margin:0 auto;padding:2rem 1.5rem}
     <button class="nav-btn" onclick="showPage('orcamento')">Orçamento</button>
     <button class="nav-btn" onclick="showPage('planejamento')">Planejamento</button>
   </nav>
-  <div style="display:flex;align-items:center;gap:8px">
+  <div class="header-right">
     <button class="btn-icon" onclick="abrirSettings()" title="Configurações">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 10a2 2 0 100-4 2 2 0 000 4z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M13.3 9.6a1 1 0 00.2 1.1l.04.04a1.2 1.2 0 01-1.7 1.7l-.04-.04a1 1 0 00-1.1-.2 1 1 0 00-.6.92v.12a1.2 1.2 0 01-2.4 0v-.06a1 1 0 00-.65-.92 1 1 0 00-1.1.2l-.04.04a1.2 1.2 0 01-1.7-1.7l.04-.04a1 1 0 00.2-1.1 1 1 0 00-.92-.6H3.4a1.2 1.2 0 010-2.4h.06a1 1 0 00.92-.65 1 1 0 00-.2-1.1l-.04-.04a1.2 1.2 0 011.7-1.7l.04.04a1 1 0 001.1.2h.05a1 1 0 00.6-.92V3.4a1.2 1.2 0 012.4 0v.06a1 1 0 00.6.92 1 1 0 001.1-.2l.04-.04a1.2 1.2 0 011.7 1.7l-.04.04a1 1 0 00-.2 1.1v.05a1 1 0 00.92.6h.12a1.2 1.2 0 010 2.4h-.06a1 1 0 00-.92.6z" stroke="currentColor" stroke-width="1.3"/></svg>
     </button>
@@ -339,7 +420,7 @@ main{max-width:1140px;margin:0 auto;padding:2rem 1.5rem}
     </button>
     <button class="btn-primary" onclick="abrirModalTx()">
       <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v11M1 6.5h11" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
-      Nova transação
+      <span class="btn-label">Nova transação</span>
     </button>
   </div>
 </header>
@@ -757,14 +838,18 @@ function htmlLinhasTx(lista){
     const sign=t.tipo==='receita'?'+':'−';
     const instBadge=t.parcela?`<span class="pill-inst">${t.parcela.atual}/${t.parcela.total}</span>`:'';
     const recBadge=t.recorrenteId?`<span class="pill-rec">↺</span>`:'';
-    return`<div class="tx-row">
-      <div><div class="tx-desc">${esc(t.descricao)}${instBadge}${recBadge}</div>${t.obs?`<div class="tx-desc-sub">${esc(t.obs)}</div>`:''}</div>
-      <div>${badgeCat(t.categoria)}</div>
-      <div class="tx-date">${fmtData(t.data)}</div>
-      <div class="tx-amount ${t.tipo}">${sign} ${fmt(t.valor)}</div>
-      <div class="tx-actions">
+    const actions=`<div class="tx-actions">
         <button class="tx-edit" onclick="editarTx('${t.id}')" title="Editar"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M9 2l2 2-7 7H2V9l7-7z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <button class="tx-del" onclick="excluirTx('${t.id}')" title="Excluir"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M1.75 3.5h10.5M5.25 3.5V2.333a.583.583 0 01.583-.583h2.334a.583.583 0 01.583.583V3.5M11.083 3.5l-.583 7.583a.583.583 0 01-.583.584H4.083a.583.583 0 01-.583-.584L2.917 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>`;
+    return`<div class="tx-row">
+      <div class="tx-row-top">
+        <div><div class="tx-desc">${esc(t.descricao)}${instBadge}${recBadge}</div>${t.obs?`<div class="tx-desc-sub">${esc(t.obs)}</div>`:''}</div>
+        <div class="tx-amount ${t.tipo}">${sign} ${fmt(t.valor)}</div>
+      </div>
+      <div class="tx-row-bot">
+        <div style="display:flex;align-items:center;gap:8px">${badgeCat(t.categoria)}<span class="tx-date">${fmtData(t.data)}</span></div>
+        ${actions}
       </div>
     </div>`;
   }).join('');
@@ -798,19 +883,24 @@ function renderRecorrentes(){
   if(!recorrentes.length){el.innerHTML=`<div class="empty"><p>Nenhuma recorrente cadastrada. Adicione despesas ou receitas fixas.</p></div>`;return;}
   el.innerHTML=recorrentes.map(r=>`
     <div class="rec-row">
-      <div><div style="font-size:14px;font-weight:500">${esc(r.nome)}</div></div>
-      <div><span class="badge ${r.tipo==='receita'?'badge-income':'badge-expense'}">${r.tipo==='receita'?'Receita':'Despesa'}</span></div>
-      <div>${badgeCat(r.categoria)}</div>
-      <div style="font-size:14px;font-weight:600;color:${r.tipo==='receita'?'var(--green)':'var(--red)'}">${fmt(r.valor)}</div>
-      <div style="font-size:13px;color:var(--text-2)">Dia ${r.dia}</div>
-      <div class="rec-actions">
-        <button onclick="toggleAtivo('${r.id}')" style="display:flex;align-items:center;gap:7px;background:${r.ativo?'var(--green-bg)':'var(--surface-3)'};border:1px solid ${r.ativo?'rgba(18,207,160,.25)':'var(--border-2)'};color:${r.ativo?'var(--green)':'var(--text-3)'};padding:5px 10px;border-radius:20px;cursor:pointer;font-family:Outfit,sans-serif;font-size:12px;font-weight:600;transition:all .15s">
-          <span style="width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0"></span>
-          ${r.ativo?'Ativo':'Pausado'}
-        </button>
-        <button class="icon-btn del" onclick="excluirRec('${r.id}')" title="Excluir recorrente" style="padding:6px 8px">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1.75 3.5h10.5M5.25 3.5V2.333a.583.583 0 01.583-.583h2.334a.583.583 0 01.583.583V3.5M11.083 3.5l-.583 7.583a.583.583 0 01-.583.584H4.083a.583.583 0 01-.583-.584L2.917 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
+      <div class="rec-row-top">
+        <div>
+          <div style="font-size:14px;font-weight:500">${esc(r.nome)}</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:4px">${badgeCat(r.categoria)}<span style="font-size:12px;color:var(--text-3)">Dia ${r.dia}</span></div>
+        </div>
+        <div style="font-size:15px;font-weight:700;color:${r.tipo==='receita'?'var(--green)':'var(--red)'}">${fmt(r.valor)}</div>
+      </div>
+      <div class="rec-row-bot">
+        <span class="badge ${r.tipo==='receita'?'badge-income':'badge-expense'}">${r.tipo==='receita'?'Receita':'Despesa'}</span>
+        <div class="rec-actions">
+          <button onclick="toggleAtivo('${r.id}')" style="display:flex;align-items:center;gap:7px;background:${r.ativo?'var(--green-bg)':'var(--surface-3)'};border:1px solid ${r.ativo?'rgba(18,207,160,.25)':'var(--border-2)'};color:${r.ativo?'var(--green)':'var(--text-3)'};padding:5px 10px;border-radius:20px;cursor:pointer;font-family:Outfit,sans-serif;font-size:12px;font-weight:600;transition:all .15s">
+            <span style="width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0"></span>
+            ${r.ativo?'Ativo':'Pausado'}
+          </button>
+          <button class="icon-btn del" onclick="excluirRec('${r.id}')" title="Excluir recorrente" style="padding:6px 8px">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1.75 3.5h10.5M5.25 3.5V2.333a.583.583 0 01.583-.583h2.334a.583.583 0 01.583.583V3.5M11.083 3.5l-.583 7.583a.583.583 0 01-.583.584H4.083a.583.583 0 01-.583-.584L2.917 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
       </div>
     </div>`).join('');
 }
@@ -1422,7 +1512,7 @@ inicializar();
 <div id="login-screen" class="login-screen" style="display:none">
   <div class="login-box">
     <div class="login-logo">
-      <div class="login-logo-text">Finança<span style="color:var(--accent)">.</span></div>
+      <div class="login-logo-text">silas<span style="color:var(--accent)">finanças</span></div>
       <div class="login-logo-sub">Faça login para continuar</div>
     </div>
     <div style="margin-bottom:1rem">
