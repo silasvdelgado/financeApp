@@ -7,6 +7,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://jahwlmhbjaavdiissyms.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphaHdsbWhiamFhdmRpaXNzeW1zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MTIyNDUsImV4cCI6MjA5MjE4ODI0NX0.aXCVwMQFd3y2XhKFI1gvfac32DMK-Yl9AZLGfCxujmI  ';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+</script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
