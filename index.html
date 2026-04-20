@@ -115,10 +115,11 @@ main{max-width:1140px;margin:0 auto;padding:2rem 1.5rem}
 
 /* TRANSACTION TABLE */
 .tx-table{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
-.tx-head{display:grid;grid-template-columns:2.5fr 1.2fr 1fr 1.2fr 72px;gap:0;padding:0 1.25rem;height:40px;align-items:center;border-bottom:1px solid var(--border);background:var(--surface-2)}
+.tx-head,.tx-row{display:grid;grid-template-columns:2fr 1.2fr 1fr 1.1fr 68px;padding:0 1.25rem}
+.tx-head{height:40px;align-items:center;border-bottom:1px solid var(--border);background:var(--surface-2)}
 .tx-head span{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--text-3)}
-.tx-head span.right{text-align:right}
-.tx-row{display:grid;grid-template-columns:2.5fr 1.2fr 1fr 1.2fr 72px;gap:0;padding:0 1.25rem;min-height:58px;align-items:center;border-bottom:1px solid var(--border);transition:background .1s;cursor:default}
+.tx-head span:nth-child(4){text-align:right}
+.tx-row{min-height:58px;align-items:center;border-bottom:1px solid var(--border);transition:background .1s;cursor:default;gap:0}
 .tx-row:last-child{border-bottom:none}
 .tx-row:hover{background:var(--surface-2)}
 .tx-desc{font-size:14px;font-weight:500;color:var(--text)}
@@ -131,7 +132,7 @@ main{max-width:1140px;margin:0 auto;padding:2rem 1.5rem}
 .tx-del:hover{background:var(--red-bg);color:var(--red)}
 .tx-edit{background:none;border:none;color:var(--text-3);cursor:pointer;padding:6px 7px;border-radius:5px;transition:all .15s;line-height:1;display:flex;align-items:center;justify-content:center}
 .tx-edit:hover{background:rgba(91,108,249,.15);color:var(--accent)}
-.tx-actions{display:flex;gap:2px;align-items:center}
+.tx-actions{display:flex;gap:2px;align-items:center;justify-content:flex-end}
 .btn-icon{background:none;border:1px solid var(--border-2);color:var(--text-2);width:36px;height:36px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
 .btn-icon:hover{background:var(--surface-2);color:var(--text)}
 /* CONFIRM MODAL */
@@ -209,9 +210,10 @@ main{max-width:1140px;margin:0 auto;padding:2rem 1.5rem}
 
 /* RECURRING TABLE */
 .rec-table{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
-.rec-head{display:grid;grid-template-columns:2.5fr 1.2fr 1fr 1fr 1fr 1.2fr;padding:0 1.25rem;height:40px;align-items:center;border-bottom:1px solid var(--border);background:var(--surface-2)}
+.rec-head,.rec-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 0.6fr 1.4fr;padding:0 1.25rem}
+.rec-head{height:40px;align-items:center;border-bottom:1px solid var(--border);background:var(--surface-2)}
 .rec-head span{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--text-3)}
-.rec-row{display:grid;grid-template-columns:2.5fr 1.2fr 1fr 1fr 1fr 1.2fr;padding:0 1.25rem;min-height:56px;align-items:center;border-bottom:1px solid var(--border);transition:background .1s}
+.rec-row{min-height:56px;align-items:center;border-bottom:1px solid var(--border);transition:background .1s}
 .rec-row:last-child{border-bottom:none}
 .rec-row:hover{background:var(--surface-2)}
 .rec-actions{display:flex;align-items:center;gap:8px}
@@ -300,10 +302,10 @@ main{max-width:1140px;margin:0 auto;padding:2rem 1.5rem}
 .plan-det-meta{display:flex;gap:1.25rem;font-size:13px;color:var(--text-3);flex-wrap:wrap}
 .plan-det-meta strong{font-weight:700}
 .plan-sec-label{padding:.5rem 1.5rem;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-3);background:var(--surface-2);border-bottom:1px solid var(--border)}
-.plan-item{display:grid;grid-template-columns:1fr auto;gap:1.5rem;align-items:center;padding:.75rem 1.5rem;border-bottom:1px solid var(--border);transition:background .1s}
+.plan-item{display:grid;grid-template-columns:1fr 1fr 130px;gap:.75rem;align-items:center;padding:.75rem 1.5rem;border-bottom:1px solid var(--border);transition:background .1s}
 .plan-item:hover{background:var(--surface-2)}
-.plan-item-name{font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.plan-item-sub{font-size:11px;color:var(--text-3);display:flex;align-items:center;gap:6px}
+.plan-item-name{font-size:13px;font-weight:500;color:var(--text);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.plan-item-sub{font-size:11px;color:var(--text-3);display:flex;align-items:center;gap:6px;margin-top:3px}
 .plan-item-val{font-size:14px;font-weight:700;letter-spacing:-.3px;text-align:right;white-space:nowrap}
 .plan-item-val.rec{color:var(--green)}.plan-item-val.des{color:var(--red)}
 .plan-footer{display:grid;grid-template-columns:1fr 1fr 1fr;padding:1rem 1.5rem;border-top:2px solid var(--border-2);background:var(--surface-2);gap:1rem}
@@ -315,6 +317,8 @@ main{max-width:1140px;margin:0 auto;padding:2rem 1.5rem}
 .fonte-rec{background:rgba(245,166,35,.12);color:var(--amber)}
 .fonte-fix{background:rgba(91,108,249,.12);color:var(--accent)}
 .plan-chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1.5rem}
+.plan-item-head{display:grid;grid-template-columns:1fr 1fr 130px;gap:.75rem;padding:.4rem 1.5rem;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.plan-item-head span{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text-3)}
 
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 .page.active{animation:fadeIn .18s ease}
@@ -322,20 +326,18 @@ main{max-width:1140px;margin:0 auto;padding:2rem 1.5rem}
 /* ── RESPONSIVE ─────────────────────────────────────────────── */
 @media(max-width:768px){
   /* HEADER */
-  header{grid-template-columns:1fr auto;height:auto;padding:.75rem 1rem;flex-wrap:wrap;row-gap:.5rem}
+  header{grid-template-columns:1fr auto;height:auto;padding:.75rem 1rem;row-gap:.5rem}
   .nav{grid-column:1/-1;order:3;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
   .nav::-webkit-scrollbar{display:none}
   .nav-btn{padding:6px 13px;font-size:12px;flex-shrink:0}
 
   /* LAYOUT */
   main{padding:1rem}
-
-  /* PAGE HEAD */
   .page-head{flex-wrap:wrap;gap:.75rem}
   .filters{flex-direction:column;align-items:stretch}
   .filter-select,.filter-input{width:100%}
 
-  /* CARDS */
+  /* SUMMARY CARDS */
   .cards-grid{grid-template-columns:1fr 1fr}
   .card-value{font-size:19px}
   .card{padding:1rem 1.25rem}
@@ -344,35 +346,30 @@ main{max-width:1140px;margin:0 auto;padding:2rem 1.5rem}
   .charts-row{grid-template-columns:1fr}
   .chart-wrap{height:190px}
 
-  /* TX TABLE — 2-column grid card on mobile */
+  /* TX TABLE — 2×2 card layout
+     Row1: desc | amount
+     Row2: category | actions
+     Date hidden (visible as part of desc on mobile is enough) */
   .tx-head{display:none}
-  .tx-row{
-    grid-template-columns:1fr auto;
-    grid-template-rows:auto auto;
-    grid-template-areas:'desc amount' 'meta actions';
-    padding:.875rem 1rem;min-height:0;gap:4px 12px;align-items:start
-  }
-  .tx-row>:nth-child(1){grid-area:desc}
-  .tx-row>:nth-child(2){grid-area:meta;display:flex;align-items:center;gap:6px}
-  .tx-row>:nth-child(3){display:none} /* date hidden — shown via meta flex */
-  .tx-row>:nth-child(4){grid-area:amount;text-align:right;align-self:center}
-  .tx-row>:nth-child(5){grid-area:actions;justify-content:flex-end}
-  .tx-amount{font-size:14px}
+  .tx-row{grid-template-columns:1fr auto;grid-template-rows:auto auto;padding:.875rem 1rem;min-height:0;row-gap:5px}
+  .tx-row>:nth-child(1){grid-column:1;grid-row:1}
+  .tx-row>:nth-child(2){grid-column:1;grid-row:2;align-self:center}
+  .tx-row>:nth-child(3){display:none}
+  .tx-row>:nth-child(4){grid-column:2;grid-row:1;text-align:right;align-self:center;font-size:14px}
+  .tx-row>:nth-child(5){grid-column:2;grid-row:2;justify-content:flex-end}
 
-  /* REC TABLE — 2-column grid card on mobile */
+  /* REC TABLE — 2×2 card layout
+     Row1: name | value
+     Row2: type | actions
+     Category, Day hidden */
   .rec-head{display:none}
-  .rec-row{
-    grid-template-columns:1fr auto;
-    grid-template-rows:auto auto;
-    grid-template-areas:'name valor' 'meta actions';
-    padding:.875rem 1rem;min-height:0;gap:4px 12px;align-items:start
-  }
-  .rec-row>:nth-child(1){grid-area:name}
-  .rec-row>:nth-child(2){grid-area:meta;display:flex;align-items:center;gap:6px}
+  .rec-row{grid-template-columns:1fr auto;grid-template-rows:auto auto;padding:.875rem 1rem;min-height:0;row-gap:5px}
+  .rec-row>:nth-child(1){grid-column:1;grid-row:1}
+  .rec-row>:nth-child(2){grid-column:1;grid-row:2;align-self:center}
   .rec-row>:nth-child(3){display:none}
-  .rec-row>:nth-child(4){grid-area:valor;text-align:right;align-self:center;font-size:14px}
+  .rec-row>:nth-child(4){grid-column:2;grid-row:1;text-align:right;align-self:center;font-size:14px;font-weight:700}
   .rec-row>:nth-child(5){display:none}
-  .rec-row>:nth-child(6){grid-area:actions;justify-content:flex-end}
+  .rec-row>:nth-child(6){grid-column:2;grid-row:2;justify-content:flex-end}
 
   /* STATS */
   .stats-row{grid-template-columns:1fr}
@@ -385,6 +382,9 @@ main{max-width:1140px;margin:0 auto;padding:2rem 1.5rem}
   .mes-grid{grid-template-columns:repeat(3,1fr)}
   .plan-footer{grid-template-columns:1fr 1fr}
   .plan-det-head{flex-direction:column;align-items:flex-start}
+  .plan-item-head{display:none}
+  .plan-item{grid-template-columns:1fr 100px}
+  .plan-item>:nth-child(2){display:none}
 
   /* MODALS */
   .modal{padding:1.5rem;border-radius:16px;max-height:95vh}
@@ -453,7 +453,7 @@ main{max-width:1140px;margin:0 auto;padding:2rem 1.5rem}
     <div class="chart-card"><div class="chart-title">Fluxo mensal — últimos 6 meses</div><div class="chart-wrap"><canvas id="grafico-fluxo" role="img" aria-label="Receitas e despesas mensais"></canvas></div></div>
   </div>
   <div class="section-head"><div class="section-title">Transações recentes</div><button class="link-btn" onclick="showPage('transacoes')">Ver todas →</button></div>
-  <div class="tx-table"><div class="tx-head"><span>Descrição</span><span>Categoria</span><span>Data</span><span class="right">Valor</span><span></span></div><div id="lista-recentes"></div></div>
+  <div class="tx-table"><div class="tx-head"><span>Descrição</span><span>Categoria</span><span>Data</span><span>Valor</span><span></span></div><div id="lista-recentes"></div></div>
 </div>
 
 <!-- TRANSAÇÕES -->
@@ -467,7 +467,7 @@ main{max-width:1140px;margin:0 auto;padding:2rem 1.5rem}
       <input class="filter-input" type="text" id="f-busca" placeholder="Buscar…" oninput="renderTransacoes()">
     </div>
   </div>
-  <div class="tx-table"><div class="tx-head"><span>Descrição</span><span>Categoria</span><span>Data</span><span class="right">Valor</span><span></span></div><div id="lista-tx"></div></div>
+  <div class="tx-table"><div class="tx-head"><span>Descrição</span><span>Categoria</span><span>Data</span><span>Valor</span><span></span></div><div id="lista-tx"></div></div>
 </div>
 
 <!-- RECORRENTES -->
@@ -849,8 +849,8 @@ function htmlLinhasTx(lista){
     const recBadge=t.recorrenteId?`<span class="pill-rec">↺</span>`:'';
     return`<div class="tx-row">
       <div><div class="tx-desc">${esc(t.descricao)}${instBadge}${recBadge}</div>${t.obs?`<div class="tx-desc-sub">${esc(t.obs)}</div>`:''}</div>
-      <div style="display:flex;align-items:center;gap:6px">${badgeCat(t.categoria)}<span class="tx-date">${fmtData(t.data)}</span></div>
-      <div class="tx-date" style="display:none">${fmtData(t.data)}</div>
+      <div>${badgeCat(t.categoria)}</div>
+      <div class="tx-date">${fmtData(t.data)}</div>
       <div class="tx-amount ${t.tipo}">${sign} ${fmt(t.valor)}</div>
       <div class="tx-actions">
         <button class="tx-edit" onclick="editarTx('${t.id}')" title="Editar"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M9 2l2 2-7 7H2V9l7-7z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -1352,8 +1352,8 @@ function renderDetalheMes(proj){
         ${esc(x.descricao)}
         ${x.fonte==='parcela'?`<span class="fonte-pill fonte-rec">${x.parcLabel}</span>`:'<span class="fonte-pill fonte-fix">fixo</span>'}
       </div>
-      <div class="plan-item-sub">${badgeCat(x.categoria)}<span>dia ${x.dia}</span></div>
     </div>
+    <div class="plan-item-sub">${badgeCat(x.categoria)}<span>dia ${x.dia}</span></div>
     <div class="plan-item-val ${x.tipo==='receita'?'rec':'des'}">${x.tipo==='receita'?'+':'−'} ${fmt(x.valor)}</div>
   </div>`;
 
@@ -1368,8 +1368,8 @@ function renderDetalheMes(proj){
     </div>
     ${!receitas.length&&!despesas.length
       ?`<div class="plan-empty">Nenhum lançamento fixo para este mês.<br>Adicione itens em <strong>Recorrentes</strong> para ver a projeção.</div>`
-      :`${receitas.length?`<div class="plan-sec-label">Receitas esperadas — ${fmt(m.receitas)}</div>${receitas.map(itemHtml).join('')}`:''}
-       ${despesas.length?`<div class="plan-sec-label">Despesas esperadas — ${fmt(m.despesas)}</div>${despesas.map(itemHtml).join('')}`:''}`}
+      :`${receitas.length?`<div class="plan-sec-label">Receitas esperadas — ${fmt(m.receitas)}</div><div class="plan-item-head"><span>Descrição</span><span>Categoria</span><span style="text-align:right">Valor</span></div>${receitas.map(itemHtml).join('')}`:''}
+       ${despesas.length?`<div class="plan-sec-label">Despesas esperadas — ${fmt(m.despesas)}</div><div class="plan-item-head"><span>Descrição</span><span>Categoria</span><span style="text-align:right">Valor</span></div>${despesas.map(itemHtml).join('')}`:''}`}
     <div class="plan-footer">
       <div class="plan-footer-group">
         <div class="plan-footer-lbl">Receitas</div>
