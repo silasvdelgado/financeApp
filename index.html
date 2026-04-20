@@ -344,26 +344,35 @@ main{max-width:1140px;margin:0 auto;padding:2rem 1.5rem}
   .charts-row{grid-template-columns:1fr}
   .chart-wrap{height:190px}
 
-  /* TX TABLE — card style on mobile */
+  /* TX TABLE — 2-column grid card on mobile */
   .tx-head{display:none}
   .tx-row{
-    display:flex;flex-direction:column;
-    padding:.875rem 1rem;gap:6px;
-    align-items:stretch
+    grid-template-columns:1fr auto;
+    grid-template-rows:auto auto;
+    grid-template-areas:'desc amount' 'meta actions';
+    padding:.875rem 1rem;min-height:0;gap:4px 12px;align-items:start
   }
-  .tx-row-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
-  .tx-row-bot{display:flex;justify-content:space-between;align-items:center}
-  .tx-amount{text-align:left}
-  .tx-date{font-size:12px}
+  .tx-row>:nth-child(1){grid-area:desc}
+  .tx-row>:nth-child(2){grid-area:meta;display:flex;align-items:center;gap:6px}
+  .tx-row>:nth-child(3){display:none} /* date hidden — shown via meta flex */
+  .tx-row>:nth-child(4){grid-area:amount;text-align:right;align-self:center}
+  .tx-row>:nth-child(5){grid-area:actions;justify-content:flex-end}
+  .tx-amount{font-size:14px}
 
-  /* REC TABLE — card style on mobile */
+  /* REC TABLE — 2-column grid card on mobile */
   .rec-head{display:none}
   .rec-row{
-    display:flex;flex-direction:column;
-    padding:.875rem 1rem;gap:8px
+    grid-template-columns:1fr auto;
+    grid-template-rows:auto auto;
+    grid-template-areas:'name valor' 'meta actions';
+    padding:.875rem 1rem;min-height:0;gap:4px 12px;align-items:start
   }
-  .rec-row-top{display:flex;justify-content:space-between;align-items:center}
-  .rec-row-bot{display:flex;justify-content:space-between;align-items:center}
+  .rec-row>:nth-child(1){grid-area:name}
+  .rec-row>:nth-child(2){grid-area:meta;display:flex;align-items:center;gap:6px}
+  .rec-row>:nth-child(3){display:none}
+  .rec-row>:nth-child(4){grid-area:valor;text-align:right;align-self:center;font-size:14px}
+  .rec-row>:nth-child(5){display:none}
+  .rec-row>:nth-child(6){grid-area:actions;justify-content:flex-end}
 
   /* STATS */
   .stats-row{grid-template-columns:1fr}
@@ -403,7 +412,7 @@ main{max-width:1140px;margin:0 auto;padding:2rem 1.5rem}
 <body>
 
 <header>
-  <div class="logo">silas<span>finanças</span></div>
+  <div class="logo">fin<span>ança</span></div>
   <nav class="nav">
     <button class="nav-btn active" onclick="showPage('visao-geral')">Visão Geral</button>
     <button class="nav-btn" onclick="showPage('transacoes')">Transações</button>
@@ -838,18 +847,14 @@ function htmlLinhasTx(lista){
     const sign=t.tipo==='receita'?'+':'−';
     const instBadge=t.parcela?`<span class="pill-inst">${t.parcela.atual}/${t.parcela.total}</span>`:'';
     const recBadge=t.recorrenteId?`<span class="pill-rec">↺</span>`:'';
-    const actions=`<div class="tx-actions">
+    return`<div class="tx-row">
+      <div><div class="tx-desc">${esc(t.descricao)}${instBadge}${recBadge}</div>${t.obs?`<div class="tx-desc-sub">${esc(t.obs)}</div>`:''}</div>
+      <div style="display:flex;align-items:center;gap:6px">${badgeCat(t.categoria)}<span class="tx-date">${fmtData(t.data)}</span></div>
+      <div class="tx-date" style="display:none">${fmtData(t.data)}</div>
+      <div class="tx-amount ${t.tipo}">${sign} ${fmt(t.valor)}</div>
+      <div class="tx-actions">
         <button class="tx-edit" onclick="editarTx('${t.id}')" title="Editar"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M9 2l2 2-7 7H2V9l7-7z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <button class="tx-del" onclick="excluirTx('${t.id}')" title="Excluir"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M1.75 3.5h10.5M5.25 3.5V2.333a.583.583 0 01.583-.583h2.334a.583.583 0 01.583.583V3.5M11.083 3.5l-.583 7.583a.583.583 0 01-.583.584H4.083a.583.583 0 01-.583-.584L2.917 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-      </div>`;
-    return`<div class="tx-row">
-      <div class="tx-row-top">
-        <div><div class="tx-desc">${esc(t.descricao)}${instBadge}${recBadge}</div>${t.obs?`<div class="tx-desc-sub">${esc(t.obs)}</div>`:''}</div>
-        <div class="tx-amount ${t.tipo}">${sign} ${fmt(t.valor)}</div>
-      </div>
-      <div class="tx-row-bot">
-        <div style="display:flex;align-items:center;gap:8px">${badgeCat(t.categoria)}<span class="tx-date">${fmtData(t.data)}</span></div>
-        ${actions}
       </div>
     </div>`;
   }).join('');
@@ -883,24 +888,19 @@ function renderRecorrentes(){
   if(!recorrentes.length){el.innerHTML=`<div class="empty"><p>Nenhuma recorrente cadastrada. Adicione despesas ou receitas fixas.</p></div>`;return;}
   el.innerHTML=recorrentes.map(r=>`
     <div class="rec-row">
-      <div class="rec-row-top">
-        <div>
-          <div style="font-size:14px;font-weight:500">${esc(r.nome)}</div>
-          <div style="display:flex;align-items:center;gap:6px;margin-top:4px">${badgeCat(r.categoria)}<span style="font-size:12px;color:var(--text-3)">Dia ${r.dia}</span></div>
-        </div>
-        <div style="font-size:15px;font-weight:700;color:${r.tipo==='receita'?'var(--green)':'var(--red)'}">${fmt(r.valor)}</div>
-      </div>
-      <div class="rec-row-bot">
-        <span class="badge ${r.tipo==='receita'?'badge-income':'badge-expense'}">${r.tipo==='receita'?'Receita':'Despesa'}</span>
-        <div class="rec-actions">
-          <button onclick="toggleAtivo('${r.id}')" style="display:flex;align-items:center;gap:7px;background:${r.ativo?'var(--green-bg)':'var(--surface-3)'};border:1px solid ${r.ativo?'rgba(18,207,160,.25)':'var(--border-2)'};color:${r.ativo?'var(--green)':'var(--text-3)'};padding:5px 10px;border-radius:20px;cursor:pointer;font-family:Outfit,sans-serif;font-size:12px;font-weight:600;transition:all .15s">
-            <span style="width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0"></span>
-            ${r.ativo?'Ativo':'Pausado'}
-          </button>
-          <button class="icon-btn del" onclick="excluirRec('${r.id}')" title="Excluir recorrente" style="padding:6px 8px">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1.75 3.5h10.5M5.25 3.5V2.333a.583.583 0 01.583-.583h2.334a.583.583 0 01.583.583V3.5M11.083 3.5l-.583 7.583a.583.583 0 01-.583.584H4.083a.583.583 0 01-.583-.584L2.917 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
-        </div>
+      <div><div style="font-size:14px;font-weight:500">${esc(r.nome)}</div></div>
+      <div><span class="badge ${r.tipo==='receita'?'badge-income':'badge-expense'}">${r.tipo==='receita'?'Receita':'Despesa'}</span></div>
+      <div>${badgeCat(r.categoria)}</div>
+      <div style="font-size:14px;font-weight:600;color:${r.tipo==='receita'?'var(--green)':'var(--red)'}">${fmt(r.valor)}</div>
+      <div style="font-size:13px;color:var(--text-2)">Dia ${r.dia}</div>
+      <div class="rec-actions">
+        <button onclick="toggleAtivo('${r.id}')" style="display:flex;align-items:center;gap:7px;background:${r.ativo?'var(--green-bg)':'var(--surface-3)'};border:1px solid ${r.ativo?'rgba(18,207,160,.25)':'var(--border-2)'};color:${r.ativo?'var(--green)':'var(--text-3)'};padding:5px 10px;border-radius:20px;cursor:pointer;font-family:Outfit,sans-serif;font-size:12px;font-weight:600;transition:all .15s">
+          <span style="width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0"></span>
+          ${r.ativo?'Ativo':'Pausado'}
+        </button>
+        <button class="icon-btn del" onclick="excluirRec('${r.id}')" title="Excluir recorrente" style="padding:6px 8px">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1.75 3.5h10.5M5.25 3.5V2.333a.583.583 0 01.583-.583h2.334a.583.583 0 01.583.583V3.5M11.083 3.5l-.583 7.583a.583.583 0 01-.583.584H4.083a.583.583 0 01-.583-.584L2.917 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
       </div>
     </div>`).join('');
 }
@@ -1512,7 +1512,7 @@ inicializar();
 <div id="login-screen" class="login-screen" style="display:none">
   <div class="login-box">
     <div class="login-logo">
-      <div class="login-logo-text">silas<span style="color:var(--accent)">finanças</span></div>
+      <div class="login-logo-text">Finança<span style="color:var(--accent)">.</span></div>
       <div class="login-logo-sub">Faça login para continuar</div>
     </div>
     <div style="margin-bottom:1rem">
